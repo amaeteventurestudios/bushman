@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bushman Robot Kit</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --rust: #C84B31;
+      --sand: #E8D5B0;
+      --earth: #8B6914;
+      --dark: #1A1209;
+      --mid: #2E1F0A;
+      --light: #F5EDD8;
+      --metal: #9AA3A8;
+      --accent: #F4A623;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--dark);
+      color: var(--sand);
+      font-family: 'DM Sans', sans-serif;
+      overflow-x: hidden;
+      cursor: crosshair;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 18px 48px;
+      background: rgba(26,18,9,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(232,213,176,0.08);
+    }
+    .nav-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.5rem;
+      letter-spacing: 0.12em;
+      color: var(--accent);
+    }
+    nav ul { list-style: none; display: flex; gap: 36px; }
+    nav a {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--metal);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    nav a:hover { color: var(--accent); }
+
+    /* ── HERO ── */
+    #hero {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      padding: 120px 80px 80px;
+      position: relative;
+      overflow: hidden;
+      background: var(--dark);
+    }
+
+    /* grid overlay */
+    #hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(232,213,176,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(232,213,176,0.04) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+    }
+
+    .hero-tag {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--rust);
+      background: rgba(200,75,49,0.12);
+      border: 1px solid rgba(200,75,49,0.3);
+      display: inline-block;
+      padding: 6px 14px;
+      margin-bottom: 28px;
+      animation: fadeUp 0.6s ease both;
+    }
+
+    .hero-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(4.5rem, 8vw, 9rem);
+      line-height: 0.92;
+      letter-spacing: 0.02em;
+      color: var(--light);
+      margin-bottom: 28px;
+      animation: fadeUp 0.6s 0.1s ease both;
+    }
+
+    .hero-title span {
+      color: var(--accent);
+      display: block;
+    }
+
+    .hero-desc {
+      font-size: 1.05rem;
+      line-height: 1.7;
+      color: var(--metal);
+      max-width: 440px;
+      margin-bottom: 44px;
+      font-weight: 300;
+      animation: fadeUp 0.6s 0.2s ease both;
+    }
+
+    .hero-cta {
+      display: inline-flex; align-items: center; gap: 12px;
+      background: var(--rust);
+      color: var(--light);
+      font-family: 'Space Mono', monospace;
+      font-size: 0.75rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      text-decoration: none;
+      padding: 16px 32px;
+      border: 2px solid var(--rust);
+      transition: all 0.25s;
+      animation: fadeUp 0.6s 0.3s ease both;
+    }
+    .hero-cta:hover {
+      background: transparent;
+      color: var(--rust);
+    }
+    .hero-cta svg { transition: transform 0.25s; }
+    .hero-cta:hover svg { transform: translateX(4px); }
+
+    /* Robot illustration */
+    .robot-wrap {
+      display: flex; justify-content: center; align-items: center;
+      position: relative;
+      animation: fadeUp 0.8s 0.15s ease both;
+    }
+
+    .robot-svg {
+      width: 340px; height: auto;
+      filter: drop-shadow(0 0 60px rgba(244,166,35,0.25));
+      animation: float 4s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-16px); }
+    }
+
+    .hero-badge {
+      position: absolute;
+      bottom: 20px; right: 10px;
+      background: var(--mid);
+      border: 1px solid rgba(232,213,176,0.12);
+      padding: 14px 20px;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--accent);
+      letter-spacing: 0.1em;
+    }
+    .hero-badge strong { display: block; font-size: 1.6rem; color: var(--light); font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.05em; }
+
+    /* ── FEATURES ── */
+    #features {
+      padding: 120px 80px;
+      background: var(--mid);
+      position: relative;
+      overflow: hidden;
+    }
+
+    #features::after {
+      content: 'KIT';
+      position: absolute;
+      right: -40px; top: 50%;
+      transform: translateY(-50%);
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 22vw;
+      color: rgba(255,255,255,0.02);
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    .section-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--rust);
+      margin-bottom: 16px;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .section-label::before {
+      content: '';
+      display: inline-block;
+      width: 32px; height: 1px;
+      background: var(--rust);
+    }
+
+    .section-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(3rem, 5vw, 5.5rem);
+      line-height: 0.95;
+      color: var(--light);
+      margin-bottom: 64px;
+      max-width: 600px;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+    }
+
+    .feature-card {
+      background: rgba(26,18,9,0.6);
+      border: 1px solid rgba(232,213,176,0.06);
+      padding: 44px 36px;
+      position: relative;
+      transition: border-color 0.3s, background 0.3s;
+      overflow: hidden;
+    }
+
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--rust);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.35s ease;
+    }
+
+    .feature-card:hover::before { transform: scaleX(1); }
+    .feature-card:hover {
+      background: rgba(44,31,14,0.9);
+      border-color: rgba(232,213,176,0.12);
+    }
+
+    .feat-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 5rem;
+      color: rgba(244,166,35,0.08);
+      line-height: 1;
+      position: absolute;
+      top: 20px; right: 24px;
+      transition: color 0.3s;
+    }
+    .feature-card:hover .feat-num { color: rgba(244,166,35,0.14); }
+
+    .feat-icon {
+      width: 44px; height: 44px;
+      margin-bottom: 24px;
+      color: var(--accent);
+    }
+
+    .feat-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.6rem;
+      letter-spacing: 0.05em;
+      color: var(--light);
+      margin-bottom: 12px;
+    }
+
+    .feat-desc {
+      font-size: 0.9rem;
+      line-height: 1.65;
+      color: var(--metal);
+      font-weight: 300;
+    }
+
+    /* ── HOW IT WORKS ── */
+    #how {
+      padding: 120px 80px;
+      background: var(--dark);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .how-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: start;
+    }
+
+    .steps { margin-top: 56px; }
+
+    .step {
+      display: flex;
+      gap: 28px;
+      padding: 32px 0;
+      border-bottom: 1px solid rgba(232,213,176,0.07);
+      position: relative;
+      transition: all 0.3s;
+    }
+    .step:first-child { border-top: 1px solid rgba(232,213,176,0.07); }
+
+    .step-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 3.5rem;
+      line-height: 1;
+      color: rgba(244,166,35,0.15);
+      min-width: 56px;
+      transition: color 0.3s;
+    }
+
+    .step:hover .step-num { color: var(--accent); }
+
+    .step-content {}
+
+    .step-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.4rem;
+      letter-spacing: 0.06em;
+      color: var(--light);
+      margin-bottom: 8px;
+    }
+
+    .step-desc {
+      font-size: 0.88rem;
+      line-height: 1.65;
+      color: var(--metal);
+      font-weight: 300;
+    }
+
+    .how-visual {
+      position: sticky;
+      top: 120px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .spec-block {
+      background: var(--mid);
+      border: 1px solid rgba(232,213,176,0.08);
+      padding: 24px 28px;
+    }
+
+    .spec-block-title {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--rust);
+      margin-bottom: 16px;
+    }
+
+    .spec-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(232,213,176,0.05);
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem;
+    }
+    .spec-row:last-child { border-bottom: none; }
+    .spec-row span:first-child { color: var(--metal); letter-spacing: 0.05em; }
+    .spec-row span:last-child { color: var(--accent); font-weight: 700; }
+
+    .cta-block {
+      background: var(--rust);
+      padding: 36px 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .cta-block p {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.2rem;
+      color: var(--light);
+      line-height: 1.05;
+    }
+
+    .cta-btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      background: var(--dark);
+      color: var(--light);
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      text-decoration: none;
+      padding: 14px 24px;
+      border: 2px solid var(--dark);
+      transition: all 0.25s;
+      align-self: flex-start;
+    }
+    .cta-btn:hover {
+      background: transparent;
+      color: var(--dark);
+      border-color: var(--dark);
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 36px 80px;
+      border-top: 1px solid rgba(232,213,176,0.06);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    footer p {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem;
+      color: rgba(154,163,168,0.4);
+      letter-spacing: 0.1em;
+    }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      #hero, .how-inner { grid-template-columns: 1fr; }
+      .robot-wrap { display: none; }
+      #hero, #features, #how { padding: 80px 32px; }
+      .features-grid { grid-template-columns: 1fr; }
+      nav { padding: 16px 24px; }
+      nav ul { display: none; }
+      footer { flex-direction: column; gap: 12px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="nav-logo">Bushman Robot</div>
+    <ul>
+      <li><a href="#hero">Home</a></li>
+      <li><a href="#features">Kit</a></li>
+      <li><a href="#how">Build</a></li>
+    </ul>
+  </nav>
+
+  <!-- ── SECTION 1: HERO ── -->
+  <section id="hero">
+    <div class="hero-content">
+      <div class="hero-tag">// Field-Ready Build Kit</div>
+      <h1 class="hero-title">
+        Bushman
+        <span>Robot</span>
+        Kit
+      </h1>
+      <p class="hero-desc">
+        A rugged, modular robot kit engineered for the wild. Built to endure dust, heat, and terrain — assembled by human hands, in any environment.
+      </p>
+      <a href="#features" class="hero-cta">
+        Explore the Kit
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+    <div class="robot-wrap">
+      <!-- SVG Robot Illustration -->
+      <svg class="robot-svg" viewBox="0 0 280 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- antenna -->
+        <line x1="140" y1="30" x2="140" y2="70" stroke="#9AA3A8" stroke-width="3"/>
+        <circle cx="140" cy="22" r="10" fill="#F4A623" opacity="0.9"/>
+        <circle cx="140" cy="22" r="5" fill="#C84B31"/>
+        <!-- head -->
+        <rect x="90" y="70" width="100" height="80" rx="12" fill="#2E1F0A" stroke="#8B6914" stroke-width="2"/>
+        <!-- eyes -->
+        <rect x="108" y="92" width="26" height="18" rx="4" fill="#F4A623" opacity="0.15"/>
+        <rect x="108" y="92" width="26" height="18" rx="4" stroke="#F4A623" stroke-width="1.5"/>
+        <circle cx="121" cy="101" r="6" fill="#F4A623"/>
+        <circle cx="121" cy="101" r="3" fill="#1A1209"/>
+
+        <rect x="146" y="92" width="26" height="18" rx="4" fill="#F4A623" opacity="0.15"/>
+        <rect x="146" y="92" width="26" height="18" rx="4" stroke="#F4A623" stroke-width="1.5"/>
+        <circle cx="159" cy="101" r="6" fill="#F4A623"/>
+        <circle cx="159" cy="101" r="3" fill="#1A1209"/>
+        <!-- mouth -->
+        <rect x="110" y="124" width="60" height="14" rx="4" fill="#1A1209" stroke="#8B6914" stroke-width="1.5"/>
+        <rect x="116" y="128" width="10" height="6" rx="1" fill="#C84B31"/>
+        <rect x="130" y="128" width="10" height="6" rx="1" fill="#C84B31"/>
+        <rect x="144" y="128" width="10" height="6" rx="1" fill="#C84B31"/>
+        <!-- neck -->
+        <rect x="126" y="150" width="28" height="18" rx="4" fill="#2E1F0A" stroke="#8B6914" stroke-width="1.5"/>
+        <!-- body -->
+        <rect x="70" y="168" width="140" height="120" rx="14" fill="#2E1F0A" stroke="#8B6914" stroke-width="2"/>
+        <!-- chest panel -->
+        <rect x="90" y="184" width="100" height="60" rx="8" fill="#1A1209" stroke="#8B6914" stroke-width="1"/>
+        <circle cx="113" cy="204" r="10" fill="none" stroke="#F4A623" stroke-width="1.5"/>
+        <circle cx="113" cy="204" r="5" fill="#F4A623" opacity="0.6"/>
+        <rect x="130" y="196" width="45" height="8" rx="2" fill="#C84B31" opacity="0.3"/>
+        <rect x="130" y="196" width="28" height="8" rx="2" fill="#C84B31"/>
+        <rect x="130" y="210" width="45" height="8" rx="2" fill="#F4A623" opacity="0.3"/>
+        <rect x="130" y="210" width="38" height="8" rx="2" fill="#F4A623"/>
+        <rect x="90" y="222" width="100" height="8" rx="2" fill="#8B6914" opacity="0.2"/>
+        <!-- bolt accents -->
+        <circle cx="80" cy="178" r="4" fill="#8B6914"/>
+        <circle cx="200" cy="178" r="4" fill="#8B6914"/>
+        <circle cx="80" cy="278" r="4" fill="#8B6914"/>
+        <circle cx="200" cy="278" r="4" fill="#8B6914"/>
+        <!-- left arm -->
+        <rect x="22" y="168" width="46" height="20" rx="10" fill="#2E1F0A" stroke="#8B6914" stroke-width="1.5"/>
+        <rect x="18" y="188" width="36" height="70" rx="8" fill="#2E1F0A" stroke="#8B6914" stroke-width="1.5"/>
+        <rect x="14" y="258" width="44" height="28" rx="8" fill="#2E1F0A" stroke="#C84B31" stroke-width="1.5"/>
+        <line x1="22" y1="272" x2="50" y2="272" stroke="#C84B31" stroke-width="1.5"/>
+        <!-- right arm -->
+        <rect x="212" y="168" width="46" height="20" rx="10" fill="#2E1F0A" stroke="#8B6914" stroke-width="1.5"/>
+        <rect x="226" y="188" width="36" height="70" rx="8" fill="#2E1F0A" stroke="#8B6914" stroke-width="1.5"/>
+        <rect x="222" y="258" width="44" height="28" rx="8" fill="#2E1F0A" stroke="#F4A623" stroke-width="1.5"/>
+        <line x1="230" y1="272" x2="258" y2="272" stroke="#F4A623" stroke-width="1.5"/>
+        <!-- legs -->
+        <rect x="92" y="288" width="38" height="80" rx="10" fill="#2E1F0A" stroke="#8B6914" stroke-width="1.5"/>
+        <rect x="150" y="288" width="38" height="80" rx="10" fill="#2E1F0A" stroke="#8B6914" stroke-width="1.5"/>
+        <!-- feet -->
+        <rect x="82" y="356" width="56" height="22" rx="8" fill="#2E1F0A" stroke="#8B6914" stroke-width="1.5"/>
+        <rect x="142" y="356" width="56" height="22" rx="8" fill="#2E1F0A" stroke="#8B6914" stroke-width="1.5"/>
+      </svg>
+      <div class="hero-badge">
+        <strong>V2.4</strong>
+        FIELD EDITION
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SECTION 2: FEATURES ── -->
+  <section id="features">
+    <div class="section-label">What's Inside</div>
+    <h2 class="section-title">Every Part. Every Tool. Zero Guesswork.</h2>
+    <div class="features-grid">
+
+      <div class="feature-card">
+        <span class="feat-num">01</span>
+        <svg class="feat-icon" viewBox="0 0 44 44" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="8" y="12" width="28" height="22" rx="4"/>
+          <circle cx="17" cy="20" r="3"/>
+          <circle cx="27" cy="20" r="3"/>
+          <rect x="14" y="27" width="16" height="4" rx="2"/>
+          <line x1="22" y1="8" x2="22" y2="12"/>
+          <circle cx="22" cy="6" r="2" fill="currentColor"/>
+        </svg>
+        <div class="feat-title">Pre-Cut Chassis Panels</div>
+        <p class="feat-desc">Aircraft-grade aluminium panels, laser-cut and deburred, ready to bolt together. Lightweight yet sturdy enough for off-road terrain.</p>
+      </div>
+
+      <div class="feature-card">
+        <span class="feat-num">02</span>
+        <svg class="feat-icon" viewBox="0 0 44 44" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="22" cy="22" r="12"/>
+          <path d="M22 10V8M22 36v-2M34 22h2M8 22H6"/>
+          <path d="M29.5 14.5l1.4-1.4M13.1 30.9l1.4-1.4M29.5 29.5l1.4 1.4M13.1 13.1l1.4 1.4"/>
+          <circle cx="22" cy="22" r="4" fill="currentColor" opacity="0.3"/>
+        </svg>
+        <div class="feat-title">Dual Motor System</div>
+        <p class="feat-desc">Two high-torque brushless motors with independent drive control. Tackle slopes, sand, and uneven ground without breaking a sweat.</p>
+      </div>
+
+      <div class="feature-card">
+        <span class="feat-num">03</span>
+        <svg class="feat-icon" viewBox="0 0 44 44" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="10" y="8" width="24" height="16" rx="3"/>
+          <path d="M16 24v12M28 24v12M10 32h24"/>
+          <circle cx="22" cy="16" r="3"/>
+          <path d="M17 12h10"/>
+        </svg>
+        <div class="feat-title">Open-Source Control Board</div>
+        <p class="feat-desc">Arduino-compatible main board with wireless module. Flash your own firmware, extend with sensors, or use our starter code library.</p>
+      </div>
+
+      <div class="feature-card">
+        <span class="feat-num">04</span>
+        <svg class="feat-icon" viewBox="0 0 44 44" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M8 20l14-12 14 12v16H8z"/>
+          <rect x="16" y="24" width="12" height="12" rx="1"/>
+          <path d="M22 24v12"/>
+        </svg>
+        <div class="feat-title">Dust-Sealed Enclosures</div>
+        <p class="feat-desc">IP54-rated electronics bay keeps grit, sand, and light rain out. Designed for the bush, tested in the red dirt.</p>
+      </div>
+
+      <div class="feature-card">
+        <span class="feat-num">05</span>
+        <svg class="feat-icon" viewBox="0 0 44 44" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M22 6l4 10h10l-8 6 3 10-9-6-9 6 3-10-8-6h10z"/>
+        </svg>
+        <div class="feat-title">Sensor Expansion Pack</div>
+        <p class="feat-desc">Ultrasonic distance, IR proximity, ambient light, and temperature sensors included. Snap them in with colour-coded JST connectors.</p>
+      </div>
+
+      <div class="feature-card">
+        <span class="feat-num">06</span>
+        <svg class="feat-icon" viewBox="0 0 44 44" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="6" y="14" width="32" height="20" rx="4"/>
+          <path d="M14 14v-4M30 14v-4"/>
+          <path d="M12 24h4M20 24h4M28 24h4"/>
+          <path d="M12 28h8"/>
+        </svg>
+        <div class="feat-title">Field Repair Manual</div>
+        <p class="feat-desc">A printed, laminated assembly and repair guide. Water-resistant pages, step-by-step diagrams — built to survive wherever you are.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── SECTION 3: HOW IT WORKS ── -->
+  <section id="how">
+    <div class="how-inner">
+      <div>
+        <div class="section-label">How It Works</div>
+        <h2 class="section-title">From Box to Bush in Four Steps</h2>
+        <div class="steps">
+          <div class="step">
+            <div class="step-num">01</div>
+            <div class="step-content">
+              <div class="step-title">Unbox & Inventory</div>
+              <p class="step-desc">Every component is bagged, labelled, and numbered. Cross-check against the included parts list — nothing is missing, everything matters.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">02</div>
+            <div class="step-content">
+              <div class="step-title">Assemble the Frame</div>
+              <p class="step-desc">Bolt the chassis panels together using the hex keys provided. Snap-fit joints hold tight without thread-locking compound on first builds.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">03</div>
+            <div class="step-content">
+              <div class="step-title">Wire & Flash</div>
+              <p class="step-desc">Follow the colour-coded wiring diagram, seat the control board, and upload the starter firmware via USB. No soldering required.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">04</div>
+            <div class="step-content">
+              <div class="step-title">Calibrate & Deploy</div>
+              <p class="step-desc">Run the auto-calibration routine from the app or serial monitor. Set your drive mode, and head into the field. It's that simple.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="how-visual">
+        <div class="spec-block">
+          <div class="spec-block-title">// Technical Specs</div>
+          <div class="spec-row"><span>Weight</span><span>1.4 kg</span></div>
+          <div class="spec-row"><span>Dimensions</span><span>320 × 240 × 180 mm</span></div>
+          <div class="spec-row"><span>Motor Torque</span><span>2 × 4.8 N·m</span></div>
+          <div class="spec-row"><span>Battery</span><span>3S 2200 mAh LiPo</span></div>
+          <div class="spec-row"><span>Run Time</span><span>~90 min</span></div>
+          <div class="spec-row"><span>Wireless Range</span><span>100 m (open field)</span></div>
+          <div class="spec-row"><span>Dust/Water Rating</span><span>IP54</span></div>
+          <div class="spec-row"><span>Firmware</span><span>Open Source (MIT)</span></div>
+        </div>
+        <div class="cta-block">
+          <p>Ready to Build Your Robot?</p>
+          <a href="#" class="cta-btn">
+            Order the Kit
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>© 2026 BUSHMAN ROBOT KIT — ALL RIGHTS RESERVED</p>
+    <p>ENGINEERED FOR THE WILD</p>
+  </footer>
+
+</body>
+</html>
