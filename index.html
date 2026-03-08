@@ -22,16 +22,26 @@
     html { scroll-behavior: smooth; }
 
     body {
-      background: var(--dark);
+      background: #0e0b06;
       color: var(--sand);
       font-family: 'DM Sans', sans-serif;
       overflow-x: hidden;
       cursor: crosshair;
     }
 
+    .site-wrap {
+      max-width: 1280px;
+      margin: 0 auto;
+      background: var(--dark);
+      box-shadow: 0 0 80px rgba(0,0,0,0.6);
+      overflow: hidden;
+    }
+
     /* ── NAV ── */
     nav {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      position: fixed; top: 0; left: 50%; right: auto; z-index: 100;
+      transform: translateX(-50%);
+      width: 100%; max-width: 1280px;
       display: flex; justify-content: space-between; align-items: center;
       padding: 18px 48px;
       background: rgba(26,18,9,0.85);
@@ -439,7 +449,7 @@
   </style>
 </head>
 <body>
-
+<div class="site-wrap">
   <nav>
     <div class="nav-logo">Bushman Robot</div>
     <ul>
@@ -676,6 +686,6 @@
     <p>© 2026 BUSHMAN ROBOT KIT — ALL RIGHTS RESERVED</p>
     <p>ENGINEERED FOR THE WILD</p>
   </footer>
-
+</div>
 </body>
 </html>
